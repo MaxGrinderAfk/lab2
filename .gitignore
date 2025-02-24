@@ -35,5 +35,9 @@ build/
 .src/resources/static/
 .src/resources/templates/
 *.application.properties
-mvnw.cmd
-mvnw
+/src/main/resources/application.properties
+/.mvn/wrapper/maven-wrapper.properties
+/src/test/java/idespring/lab2/controllertest/StudentControllerTest.java
+/src/test/java/idespring/lab2/servicetest/StudentServiceImplTestTest.java
+/mvnw.cmd
+/mvnw
