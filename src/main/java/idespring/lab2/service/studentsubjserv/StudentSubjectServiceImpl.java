@@ -17,8 +17,8 @@ public class StudentSubjectServiceImpl implements StudentSubjectService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     
-    private final String studentErr = "Student not found";
-    private final String subjectErr = "Subject not found";
+    private static final String studentErr = "Student not found";
+    private static final  String subjectErr = "Subject not found";
     
     @Autowired
     public StudentSubjectServiceImpl(StudentRepository studentRepository,
