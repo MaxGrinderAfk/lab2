@@ -1,7 +1,6 @@
 package idespring.lab2.repository.studentrepo;
 
 import idespring.lab2.model.Student;
-import idespring.lab2.model.Subject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.*;
@@ -34,7 +33,7 @@ public class StudentRepositoryCustomImpl implements StudentRepositoryCustom {
         String sql = "SELECT * FROM studentmanagement.students WHERE age = :age ORDER BY name "
                 + orderBy;
 
-        return (List<Student>) em.createNativeQuery(sql, Student.class)
+        return em.createNativeQuery(sql, Student.class)
                 .setParameter("age", age)
                 .getResultList();
     }

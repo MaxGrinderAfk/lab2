@@ -2,7 +2,6 @@ package idespring.lab2.controller.groupcontroller;
 
 import idespring.lab2.model.Group;
 import idespring.lab2.service.groupservice.GroupService;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

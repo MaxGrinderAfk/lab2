@@ -32,7 +32,9 @@ public class Mark {
         this.subject = subject;
     }
 
-    public Mark(int value) {}
+    public Mark(int value) {
+        this.value = value;
+    }
 
     public Long getId() {
         return id;
