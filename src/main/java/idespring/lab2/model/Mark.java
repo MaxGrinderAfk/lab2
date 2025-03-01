@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(schema = "studentmanagement", name = "marks")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Mark implements Imark {
+public class Mark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,12 +15,14 @@ public class Mark implements Imark {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "studentid")
-    @JsonIgnore
+    @JsonIdentityReference(alwaysAsId = true)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private Student student;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "subjectid")
-    @JsonIgnore  // Заменяем аннотации, создающие цикл
+    @JsonIdentityReference(alwaysAsId = true)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private Subject subject;
 
     public Mark() {}
@@ -39,32 +41,16 @@ public class Mark implements Imark {
         }
     }
 
-    public Mark(int value, Istudent student, Isubject subject) {
+    public Mark(int value, Student student, Subject subject) {
         this.value = value;
-
-        if (student instanceof Student) {
-            this.student = (Student) student;
-        } else if (student != null) {
-            this.student = new Student();
-            this.student.setId(student.getId());
-            this.student.setName(student.getName());
-            // Устанавливаем другие необходимые свойства
-        }
-
-        if (subject instanceof Subject) {
-            this.subject = (Subject) subject;
-        } else if (subject != null) {
-            this.subject = new Subject();
-            this.subject.setId(subject.getId());
-            this.subject.setName(subject.getName());
-        }
+        this.student = student;
+        this.subject = subject;
     }
 
     public Mark(int value) {
         this.value = value;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
@@ -73,7 +59,6 @@ public class Mark implements Imark {
         this.id = id;
     }
 
-    @Override
     public int getValue() {
         return value;
     }
@@ -82,65 +67,35 @@ public class Mark implements Imark {
         this.value = value;
     }
 
-    // Используем интерфейс в сигнатуре метода
-    public Istudent getStudent() {
+    public Student getStudent() {
         return student;
     }
 
-    public void setStudent(Istudent student) {
-        if (student instanceof Student) {
-            this.student = (Student) student;
-        } else if (student != null) {
-            this.student = new Student();
-            this.student.setId(student.getId());
-            this.student.setName(student.getName());
-            // Можно установить и другие свойства, если они доступны через интерфейс
-        } else {
-            this.student = null;
-        }
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
-    public Isubject getSubject() {
+    public Subject getSubject() {
         return subject;
     }
 
-    public void setSubject(Isubject subject) {
-        if (subject instanceof Subject) {
-            this.subject = (Subject) subject;
-        } else if (subject != null) {
-            this.subject = new Subject();
-            this.subject.setId(subject.getId());
-            this.subject.setName(subject.getName());
-        } else {
-            this.subject = null;
-        }
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
-    @Override
-    @JsonProperty
     public Long getStudentId() {
         return student != null ? student.getId() : null;
     }
 
-    @Override
-    @JsonProperty
     public String getStudentName() {
         return student != null ? student.getName() : null;
     }
 
-    @Override
-    @JsonProperty
     public Long getSubjectId() {
         return subject != null ? subject.getId() : null;
     }
 
-    @Override
-    @JsonProperty
     public String getSubjectName() {
         return subject != null ? subject.getName() : null;
-    }
-
-    public Subject.MarkInfo toMarkInfo() {
-        return new Subject.MarkInfo(this.id, this.value, getStudentId(), getStudentName());
     }
 }

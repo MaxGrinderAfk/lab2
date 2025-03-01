@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Entity
 @Table(schema = "studentmanagement", name = "subjects")
-public class Subject implements Isubject {
+public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,32 +33,26 @@ public class Subject implements Isubject {
         this.id = id;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public void setName(String name) {
         this.name = name;
     }
 
-    @Override
     public Set<Student> getStudents() {
         return students;
     }
 
-    @Override
     public Set<StudentInfo> getStudentsInfo() {
         Set<StudentInfo> infos = new HashSet<>();
         for (Student student : students) {
@@ -67,17 +61,6 @@ public class Subject implements Isubject {
         return infos;
     }
 
-    @Override
-    public void setStudents(Set<Student> students) {
-        this.students = students;
-    }
-
-    @Override
-    public Set<Mark> getMarks() {
-        return marks;
-    }
-
-    @Override
     public Set<MarkInfo> getMarksInfo() {
         Set<MarkInfo> infos = new HashSet<>();
         for (Mark mark : marks) {
@@ -87,18 +70,23 @@ public class Subject implements Isubject {
         return infos;
     }
 
-    @Override
+    public void setStudents(Set<Student> students) {
+        this.students = students;
+    }
+
+    public Set<Mark> getMarks() {
+        return marks;
+    }
+
     public void setMarks(Set<Mark> marks) {
         this.marks = marks;
     }
 
-    @Override
     public void addMark(Mark mark) {
         marks.add(mark);
         mark.setSubject(this);
     }
 
-    @Override
     public void removeMark(Mark mark) {
         marks.remove(mark);
         mark.setSubject(null);
@@ -107,5 +95,4 @@ public class Subject implements Isubject {
     public record StudentInfo(Long id, String name, int age) {}
 
     public record MarkInfo(Long id, int value, Long studentId, String studentName) {}
-
 }
