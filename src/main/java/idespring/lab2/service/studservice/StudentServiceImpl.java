@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class StudentServiceImpl implements StudentServ {
     private final StudentRepository studentRepository;
+    private static final String NOTFOUND = "Student not found with id: ";
 
     @Autowired
     public StudentServiceImpl(StudentRepository studentRepository) {
@@ -23,7 +24,7 @@ public class StudentServiceImpl implements StudentServ {
             return Collections.singletonList(
                     studentRepository.findById(id)
                             .orElseThrow(() -> new
-                                    EntityNotFoundException("Student not found with id: " + id))
+                                    EntityNotFoundException(NOTFOUND + id))
             );
         }
 
@@ -46,25 +47,25 @@ public class StudentServiceImpl implements StudentServ {
     @Override
     public Student findById(Long id) {
         return studentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
     }
 
     @Override
     public Student findByIdWithSubjects(Long id) {
         return studentRepository.findByIdWithSubjects(id)
-                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
     }
 
     @Override
     public Student findByIdWithMarks(Long id) {
         return studentRepository.findByIdWithMarks(id)
-                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
     }
 
     @Override
     public Student findByIdWithSubjectsAndMarks(Long id) {
         return studentRepository.findByIdWithSubjectsAndMarks(id)
-                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
     }
 
     @Override

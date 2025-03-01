@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubjectServiceImpl implements SubjectService {
     private final SubjectRepository subjectRepository;
+    private static final String NOTFOUND = "Subject not found with id: ";
 
     @Autowired
     public SubjectServiceImpl(SubjectRepository subjectRepository) {
@@ -30,7 +31,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public Subject findById(Long id) {
         return subjectRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
     }
 
     @Override
@@ -43,19 +44,19 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public Subject findByIdWithStudents(Long id) {
         return subjectRepository.findByIdWithStudents(id)
-                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
     }
 
     @Override
     public Subject findByIdWithMarks(Long id) {
         return subjectRepository.findByIdWithMarks(id)
-                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
     }
 
     @Override
     public Subject findByIdWithStudentsAndMarks(Long id) {
         return subjectRepository.findByIdWithStudentsAndMarks(id)
-                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
     }
 
     @Override
