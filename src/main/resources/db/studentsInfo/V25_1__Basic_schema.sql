@@ -22,7 +22,7 @@ CREATE TABLE studentManagement.marks (
     studentId BIGINT NOT NULL,
     subjectId BIGINT NOT NULL,
     CONSTRAINT fkStudent FOREIGN KEY(studentId) REFERENCES students (id),
-    CONSTRAINT fkGroups FOREIGN KEY(subjectId) REFERENCES groups (id)
+    CONSTRAINT fkGroups FOREIGN KEY(subjectId) REFERENCES subjects (id)
 );
 
 CREATE TABLE studentManagement.student_subject (

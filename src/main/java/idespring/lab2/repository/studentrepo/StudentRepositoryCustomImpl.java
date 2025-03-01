@@ -17,13 +17,13 @@ public class StudentRepositoryCustomImpl implements StudentRepositoryCustom {
             orderBy = "DESC";
         }
 
-        String jpql = "SELECT s FROM Student s ORDER BY s.name" + orderBy;
+        String jpql = "SELECT s FROM Student s ORDER BY s.name " + orderBy;
         return em.createQuery(jpql, Student.class).getResultList();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Student> findByAgeAndSortByName(long age, String sort) {
+    public List<Student> findByAgeAndSortByName(int age, String sort) {
 
         String orderBy = "ASC";
         if ("DESC".equalsIgnoreCase(sort)) {

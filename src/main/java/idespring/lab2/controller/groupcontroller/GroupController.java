@@ -2,6 +2,7 @@ package idespring.lab2.controller.groupcontroller;
 
 import idespring.lab2.model.Group;
 import idespring.lab2.service.groupservice.GroupService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.*;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class GroupController {
         this.groupService = groupService;
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<Group> createGroup(@RequestBody Group group) {
         if (groupService.existsByName(group.getName())) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -27,7 +28,7 @@ public class GroupController {
         return new ResponseEntity<>(groupService.addGroup(group), HttpStatus.CREATED);
     }
 
-    @GetMapping("/get")
+    @GetMapping
     public ResponseEntity<List<Group>> getGroups(
             @RequestParam(required = false) String namePattern,
             @RequestParam(required = false) String sort) {
@@ -37,9 +38,54 @@ public class GroupController {
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/delete/{groupId}")
+    @GetMapping("/{groupId}")
+    public ResponseEntity<Group> getGroupById(@Positive @NotNull @PathVariable Long groupId) {
+        try {
+            Group group = groupService.findById(groupId);
+            return new ResponseEntity<>(group, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Group> getGroupByName(@NotEmpty @PathVariable String name) {
+        try {
+            Group group = groupService.findByName(name);
+            return new ResponseEntity<>(group, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{groupId}/students")
+    public ResponseEntity<Group> getGroupWithStudents(@Positive
+                                                          @NotNull @PathVariable Long groupId) {
+        try {
+            Group group = groupService.findByIdWithStudents(groupId);
+            return new ResponseEntity<>(group, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{groupId}")
     public ResponseEntity<Void> deleteGroup(@Positive @NotNull @PathVariable Long groupId) {
-        groupService.deleteGroup(groupId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            groupService.deleteGroup(groupId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/name/{name}")
+    public ResponseEntity<Void> deleteGroupByName(@NotEmpty @PathVariable String name) {
+        try {
+            groupService.deleteGroupByName(name);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

@@ -3,12 +3,13 @@ package idespring.lab2.controller.studsubcontroller;
 import idespring.lab2.model.Student;
 import idespring.lab2.model.Subject;
 import idespring.lab2.service.studentsubjserv.StudentSubjectService;
-import java.util.List;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/student-subjects")
@@ -20,35 +21,68 @@ public class StudentSubjectController {
         this.studentSubjectService = studentSubjectService;
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<Void> addSubjectToStudent(
             @RequestParam Long studentId,
             @RequestParam Long subjectId) {
-        studentSubjectService.addSubjectToStudent(studentId, subjectId);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        try {
+            studentSubjectService.addSubjectToStudent(studentId, subjectId);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @DeleteMapping("/remove")
+    @DeleteMapping
     public ResponseEntity<Void> removeSubjectFromStudent(
             @RequestParam Long studentId,
             @RequestParam Long subjectId) {
-        studentSubjectService.removeSubjectFromStudent(studentId, subjectId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            studentSubjectService.removeSubjectFromStudent(studentId, subjectId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("/student/{studentId}/subjects")
-    public ResponseEntity<List<Subject>> getSubjectsByStudent(@PathVariable Long studentId) {
-        List<Subject> subjects = studentSubjectService.getSubjectsByStudent(studentId);
+    @GetMapping("/{studentId}/subjects")
+    public ResponseEntity<Set<Subject>> getSubjectsByStudent(@PathVariable Long studentId) {
+        Set<Subject> subjects = new HashSet<>(studentSubjectService
+                .getSubjectsByStudent(studentId));
         return !subjects.isEmpty()
                 ? new ResponseEntity<>(subjects, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/subject/{subjectId}/students")
-    public ResponseEntity<List<Student>> getStudentsBySubject(@PathVariable Long subjectId) {
-        List<Student> students = studentSubjectService.getStudentsBySubject(subjectId);
-        return !students.isEmpty()
-                ? new ResponseEntity<>(students, HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @GetMapping("/{subjectId}/students")
+    public ResponseEntity<Set<Student>> getStudentsBySubject(@PathVariable Long subjectId) {
+        try {
+            Set<Student> students = studentSubjectService.getStudentsBySubject(subjectId);
+            return !students.isEmpty()
+                    ? new ResponseEntity<>(students, HttpStatus.OK)
+                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/student/{studentId}/with-subjects")
+    public ResponseEntity<Student> getStudentWithSubjects(@PathVariable Long studentId) {
+        try {
+            Student student = studentSubjectService.findStudentWithSubjects(studentId);
+            return new ResponseEntity<>(student, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/subject/{subjectId}/with-students")
+    public ResponseEntity<Subject> getSubjectWithStudents(@PathVariable Long subjectId) {
+        try {
+            Subject subject = studentSubjectService.findSubjectWithStudents(subjectId);
+            return new ResponseEntity<>(subject, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

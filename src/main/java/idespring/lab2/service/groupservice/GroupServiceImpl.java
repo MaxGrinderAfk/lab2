@@ -2,6 +2,7 @@ package idespring.lab2.service.groupservice;
 
 import idespring.lab2.model.Group;
 import idespring.lab2.repository.grouprepo.GroupRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,25 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Group findById(Long id) {
+        return groupRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Group not found with id: " + id));
+    }
+
+    @Override
+    public Group findByName(String name) {
+        return groupRepository.findByName(name)
+                .orElseThrow(() -> new EntityNotFoundException("Group not found with name: "
+                        + name));
+    }
+
+    @Override
+    public Group findByIdWithStudents(Long id) {
+        return groupRepository.findByIdWithStudents(id)
+                .orElseThrow(() -> new EntityNotFoundException("Group not found with id: " + id));
+    }
+
+    @Override
     public Group addGroup(Group group) {
         return groupRepository.save(group);
     }
@@ -34,6 +54,11 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void deleteGroup(Long id) {
         groupRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteGroupByName(String name) {
+        groupRepository.deleteByName(name);
     }
 
     @Override

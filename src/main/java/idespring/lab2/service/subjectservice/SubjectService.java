@@ -6,9 +6,21 @@ import java.util.List;
 public interface SubjectService {
     List<Subject> readSubjects(String namePattern, String sort);
 
+    Subject findById(Long id);
+
+    Subject findByName(String name);
+
+    Subject findByIdWithStudents(Long id);
+
+    Subject findByIdWithMarks(Long id);
+
+    Subject findByIdWithStudentsAndMarks(Long id);
+
     Subject addSubject(Subject subject);
 
     void deleteSubject(Long id);
+
+    void deleteSubjectByName(String name);
 
     boolean existsByName(String name);
 }

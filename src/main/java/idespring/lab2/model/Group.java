@@ -1,13 +1,10 @@
 package idespring.lab2.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(schema = "studentmanagement", name = "groups")
 public class Group {
@@ -17,9 +14,10 @@ public class Group {
 
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<Student> students;
+    private List<Student> students = new ArrayList<>();
 
     public Group() {}
 
@@ -53,5 +51,15 @@ public class Group {
 
     public void setStudents(List<Student> students) {
         this.students = students;
+    }
+
+    public void addStudent(Student student) {
+        students.add(student);
+        student.setGroup(this);
+    }
+
+    public void removeStudent(Student student) {
+        students.remove(student);
+        student.setGroup(null);
     }
 }

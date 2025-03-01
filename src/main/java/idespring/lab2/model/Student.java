@@ -1,17 +1,14 @@
 package idespring.lab2.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(schema = "studentmanagement", name = "students")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,19 +20,25 @@ public class Student {
 
     private int age;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "groupid", nullable = true)
+    @JsonIdentityReference(alwaysAsId = true)
     private Group group;
 
+    @JsonIdentityReference(alwaysAsId = true)
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.LAZY)
     @JoinTable (
-        name = "student_subject",
-        joinColumns = @JoinColumn(name = "studentid"),
-        inverseJoinColumns = @JoinColumn(name = "subjectid")
+            name = "student_subject",
+            joinColumns = @JoinColumn(name = "studentid"),
+            inverseJoinColumns = @JoinColumn(name = "subjectid")
     )
-    private List<Subject> subjects = new ArrayList<>();
+    private Set<Subject> subjects = new HashSet<>();
+
+    @JsonIdentityReference(alwaysAsId = true)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Mark> marks = new HashSet<>();
 
     public Student() {}
 
@@ -43,7 +46,7 @@ public class Student {
         this.id = id;
     }
 
-    public Student(String name, int age, Group group, List<Subject> subjects) {
+    public Student(String name, int age, Group group, Set<Subject> subjects) {
         this.name = name;
         this.age = age;
         this.group = group;
@@ -66,12 +69,24 @@ public class Student {
         this.name = name;
     }
 
-    public int getAge() {
-        return age;
+    public Set<Subject> getSubjects() {
+        return subjects;
     }
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setSubjects(Set<Subject> subjects) {
+        this.subjects = subjects;
+    }
+
+    public Set<Mark> getMarks() {
+        return marks;
+    }
+
+    public void setMarks(Set<Mark> marks) {
+        this.marks = marks;
+    }
+
+    public int getAge() {
+        return age;
     }
 
     public Group getGroup() {
@@ -80,25 +95,5 @@ public class Student {
 
     public void setGroup(Group group) {
         this.group = group;
-    }
-
-    public List<Subject> getSubjects() {
-        return subjects;
-    }
-
-    public void setSubjects(List<Subject> subjects) {
-        this.subjects = subjects;
-    }
-
-    public void addSubject(Subject subject) {
-        if (!subjects.contains(subject)) {
-            subjects.add(subject);
-            subject.getStudents().add(this);
-        }
-    }
-
-    public void removeSubject(Subject subject) {
-        subjects.remove(subject);
-        subject.getStudents().remove(this);
     }
 }
