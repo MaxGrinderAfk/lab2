@@ -22,7 +22,7 @@ public interface Istudent {
 
     int getAge();
 
-    Group getGroup();
+    Igroup getGroup();
 
-    void setGroup(Group group);
+    void setGroup(Igroup group);
 }
