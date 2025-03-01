@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(schema = "studentmanagement", name = "marks")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Mark {
+public class Mark implements Imark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,12 +15,12 @@ public class Mark {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "studentid")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)  // Только для десериализации
+    @JsonIgnore
     private Student student;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "subjectid")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)  // Только для десериализации
+    @JsonIgnore  // Заменяем аннотации, создающие цикл
     private Subject subject;
 
     public Mark() {}
@@ -39,16 +39,32 @@ public class Mark {
         }
     }
 
-    public Mark(int value, Student student, Subject subject) {
+    public Mark(int value, Istudent student, Isubject subject) {
         this.value = value;
-        this.student = student;
-        this.subject = subject;
+
+        if (student instanceof Student) {
+            this.student = (Student) student;
+        } else if (student != null) {
+            this.student = new Student();
+            this.student.setId(student.getId());
+            this.student.setName(student.getName());
+            // Устанавливаем другие необходимые свойства
+        }
+
+        if (subject instanceof Subject) {
+            this.subject = (Subject) subject;
+        } else if (subject != null) {
+            this.subject = new Subject();
+            this.subject.setId(subject.getId());
+            this.subject.setName(subject.getName());
+        }
     }
 
     public Mark(int value) {
         this.value = value;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
@@ -57,6 +73,7 @@ public class Mark {
         this.id = id;
     }
 
+    @Override
     public int getValue() {
         return value;
     }
@@ -65,35 +82,65 @@ public class Mark {
         this.value = value;
     }
 
-    public Student getStudent() {
+    // Используем интерфейс в сигнатуре метода
+    public Istudent getStudent() {
         return student;
     }
 
-    public void setStudent(Student student) {
-        this.student = student;
+    public void setStudent(Istudent student) {
+        if (student instanceof Student) {
+            this.student = (Student) student;
+        } else if (student != null) {
+            this.student = new Student();
+            this.student.setId(student.getId());
+            this.student.setName(student.getName());
+            // Можно установить и другие свойства, если они доступны через интерфейс
+        } else {
+            this.student = null;
+        }
     }
 
-    public Subject getSubject() {
+    public Isubject getSubject() {
         return subject;
     }
 
-    public void setSubject(Subject subject) {
-        this.subject = subject;
+    public void setSubject(Isubject subject) {
+        if (subject instanceof Subject) {
+            this.subject = (Subject) subject;
+        } else if (subject != null) {
+            this.subject = new Subject();
+            this.subject.setId(subject.getId());
+            this.subject.setName(subject.getName());
+        } else {
+            this.subject = null;
+        }
     }
 
+    @Override
+    @JsonProperty
     public Long getStudentId() {
         return student != null ? student.getId() : null;
     }
 
+    @Override
+    @JsonProperty
     public String getStudentName() {
         return student != null ? student.getName() : null;
     }
 
+    @Override
+    @JsonProperty
     public Long getSubjectId() {
         return subject != null ? subject.getId() : null;
     }
 
+    @Override
+    @JsonProperty
     public String getSubjectName() {
         return subject != null ? subject.getName() : null;
+    }
+
+    public Subject.MarkInfo toMarkInfo() {
+        return new Subject.MarkInfo(this.id, this.value, getStudentId(), getStudentName());
     }
 }
