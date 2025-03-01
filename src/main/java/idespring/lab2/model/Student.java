@@ -99,12 +99,12 @@ public class Student implements Istudent {
     }
 
     @Override
-    public Group getGroup() {
-        return group;
+    public Igroup getGroup() {
+        return (Igroup) group;
     }
 
     @Override
-    public void setGroup(Group group) {
-        this.group = group;
+    public void setGroup(Igroup group) {
+        this.group = (Group) group;
     }
 }
