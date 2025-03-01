@@ -9,7 +9,7 @@ import java.util.Set;
 @Entity
 @Table(schema = "studentmanagement", name = "students")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Student implements Istudent {
+public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,7 +21,7 @@ public class Student implements Istudent {
     private int age;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "groupid", nullable = true)
+    @JoinColumn(name = "groupid")
     @JsonIdentityReference(alwaysAsId = true)
     private Group group;
 
@@ -53,58 +53,47 @@ public class Student implements Istudent {
         this.subjects = subjects;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public void setName(String name) {
         this.name = name;
     }
 
-    @Override
     public Set<Subject> getSubjects() {
         return subjects;
     }
 
-    @Override
     public void setSubjects(Set<Subject> subjects) {
         this.subjects = subjects;
     }
 
-    @Override
     public Set<Mark> getMarks() {
         return marks;
     }
 
-    @Override
     public void setMarks(Set<Mark> marks) {
         this.marks = marks;
     }
 
-    @Override
     public int getAge() {
         return age;
     }
 
-    @Override
-    public Igroup getGroup() {
-        return (Igroup) group;
+    public Group getGroup() {
+        return group;
     }
 
-    @Override
-    public void setGroup(Igroup group) {
-        this.group = (Group) group;
+    public void setGroup(Group group) {
+        this.group = group;
     }
 }
