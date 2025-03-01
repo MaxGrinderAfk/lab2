@@ -2,56 +2,83 @@ package idespring.lab2.service.studservice;
 
 import idespring.lab2.model.Student;
 import idespring.lab2.repository.studentrepo.StudentRepository;
-import java.util.ArrayList;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class StudentServiceImpl implements StudentServ {
-    private final StudentRepository studDao;
+    private final StudentRepository studentRepository;
 
     @Autowired
-    public StudentServiceImpl(StudentRepository studDao) {
-        this.studDao = studDao;
+    public StudentServiceImpl(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
 
     @Override
     public List<Student> readStudents(Integer age, String sort, Long id) {
         if (id != null) {
-            List<Student> students = new ArrayList<>();
-            students.add(studDao.findById(id).orElse(null));
-
-            return students;
+            return Collections.singletonList(
+                    studentRepository.findById(id)
+                            .orElseThrow(() -> new
+                                    EntityNotFoundException("Student not found with id: " + id))
+            );
         }
-
-        List<Student> students;
 
         if (age != null && sort != null) {
-            students = studDao.findByAgeAndSortByName(age, sort);
+            return studentRepository.findByAgeAndSortByName(age, sort);
         } else if (age != null) {
-            students = studDao.findByAge(age);
+            return studentRepository.findByAge(age).stream().toList();
         } else if (sort != null) {
-            students = studDao.sortByName(sort);
+            return studentRepository.sortByName(sort);
         } else {
-            students = studDao.findAll();
+            return studentRepository.findAll();
         }
-        return students;
+    }
+
+    @Override
+    public List<Student> findByGroupId(Long groupId) {
+        return studentRepository.findByGroupId(groupId).stream().toList();
+    }
+
+    @Override
+    public Student findById(Long id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
+    }
+
+    @Override
+    public Student findByIdWithSubjects(Long id) {
+        return studentRepository.findByIdWithSubjects(id)
+                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
+    }
+
+    @Override
+    public Student findByIdWithMarks(Long id) {
+        return studentRepository.findByIdWithMarks(id)
+                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
+    }
+
+    @Override
+    public Student findByIdWithSubjectsAndMarks(Long id) {
+        return studentRepository.findByIdWithSubjectsAndMarks(id)
+                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
     }
 
     @Override
     public Student addStudent(Student student) {
-        return studDao.save(student);
+        return studentRepository.save(student);
     }
 
     @Override
     public void updateStudent(String name, int age, long id) {
-        studDao.update(name, age, id);
+        studentRepository.update(name, age, id);
     }
 
     @Override
     public void deleteStudent(long id) {
-        studDao.delete(id);
+        studentRepository.delete(id);
     }
 }

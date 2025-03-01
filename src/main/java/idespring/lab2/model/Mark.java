@@ -1,14 +1,14 @@
 package idespring.lab2.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+import java.util.HashMap;
+import java.util.Map;
+
 @Entity
 @Table(schema = "studentmanagement", name = "marks")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Mark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,15 +16,33 @@ public class Mark {
 
     private int value;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "studentid", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "studentid")
+    @JsonIdentityReference(alwaysAsId = true)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private Student student;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subjectid", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "subjectid")
+    @JsonIdentityReference(alwaysAsId = true)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private Subject subject;
 
     public Mark() {}
+
+    public void setStudentId(Long studentId) {
+        if (studentId != null) {
+            this.student = new Student();
+            this.student.setId(studentId);
+        }
+    }
+
+    public void setSubjectId(Long subjectId) {
+        if (subjectId != null) {
+            this.subject = new Subject();
+            this.subject.setId(subjectId);
+        }
+    }
 
     public Mark(int value, Student student, Subject subject) {
         this.value = value;
@@ -66,5 +84,21 @@ public class Mark {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public Long getStudentId() {
+        return student != null ? student.getId() : null;
+    }
+
+    public String getStudentName() {
+        return student != null ? student.getName() : null;
+    }
+
+    public Long getSubjectId() {
+        return subject != null ? subject.getId() : null;
+    }
+
+    public String getSubjectName() {
+        return subject != null ? subject.getName() : null;
     }
 }

@@ -1,13 +1,10 @@
 package idespring.lab2.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(schema = "studentmanagement", name = "subjects")
 public class Subject {
@@ -17,15 +14,17 @@ public class Subject {
 
     private String name;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY)
-    private List<Student> students;
+    private Set<Student> students = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Mark> marks;
+    private Set<Mark> marks = new HashSet<>();
 
     public Subject() {}
 
-    public Subject(String name, List<Mark> marks) {
+    public Subject(String name, Set<Mark> marks) {
         this.name = name;
         this.marks = marks;
     }
@@ -50,19 +49,51 @@ public class Subject {
         this.name = name;
     }
 
-    public List<Student> getStudents() {
+    public Set<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Student> students) {
+    public Set<StudentInfo> getStudentsInfo() {
+        Set<StudentInfo> infos = new HashSet<>();
+        for (Student student : students) {
+            infos.add(new StudentInfo(student.getId(), student.getName(), student.getAge()));
+        }
+        return infos;
+    }
+
+    public void setStudents(Set<Student> students) {
         this.students = students;
     }
 
-    public List<Mark> getMarks() {
+    public Set<Mark> getMarks() {
         return marks;
     }
 
-    public void setMarks(List<Mark> marks) {
+    public Set<MarkInfo> getMarksInfo() {
+        Set<MarkInfo> infos = new HashSet<>();
+        for (Mark mark : marks) {
+            infos.add(new MarkInfo(mark.getId(),
+                    mark.getValue(), mark.getStudentId(), mark.getStudentName()));
+        }
+        return infos;
+    }
+
+    public void setMarks(Set<Mark> marks) {
         this.marks = marks;
     }
+
+    public void addMark(Mark mark) {
+        marks.add(mark);
+        mark.setSubject(this);
+    }
+
+    public void removeMark(Mark mark) {
+        marks.remove(mark);
+        mark.setSubject(null);
+    }
+
+    public record StudentInfo(Long id, String name, int age) {}
+
+    public record MarkInfo(Long id, int value, Long studentId, String studentName) {}
+
 }

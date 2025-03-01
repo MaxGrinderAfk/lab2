@@ -2,9 +2,11 @@ package idespring.lab2.controller.subjectcontroller;
 
 import idespring.lab2.model.Subject;
 import idespring.lab2.service.subjectservice.SubjectService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ public class SubjectController {
         this.subjectService = subjectService;
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<Subject> createSubject(@Valid @RequestBody Subject subject) {
         if (subjectService.existsByName(subject.getName())) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -28,19 +30,86 @@ public class SubjectController {
         return new ResponseEntity<>(subjectService.addSubject(subject), HttpStatus.CREATED);
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<List<Subject>> getSubjects(
+    @GetMapping
+    public ResponseEntity<Set<Subject>> getSubjects(
             @RequestParam(required = false) String namePattern,
             @RequestParam(required = false) String sort) {
-        List<Subject> subjects = subjectService.readSubjects(namePattern, sort);
+        Set<Subject> subjects = new HashSet<>(subjectService.readSubjects(namePattern, sort));
         return !subjects.isEmpty()
                 ? new ResponseEntity<>(subjects, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/delete/{subjectId}")
+    @GetMapping("/{subjectId}")
+    public ResponseEntity<Subject> getSubjectById(@Positive @NotNull @PathVariable Long subjectId) {
+        try {
+            Subject subject = subjectService.findById(subjectId);
+            return new ResponseEntity<>(subject, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<Subject> getSubjectByName(@NotEmpty @PathVariable String name) {
+        try {
+            Subject subject = subjectService.findByName(name);
+            return new ResponseEntity<>(subject, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{subjectId}/students")
+    public ResponseEntity<Subject> getSubjectWithStudents(
+            @Positive @NotNull @PathVariable Long subjectId) {
+        try {
+            Subject subject = subjectService.findByIdWithStudents(subjectId);
+            return new ResponseEntity<>(subject, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{subjectId}/marks")
+    public ResponseEntity<Subject> getSubjectWithMarks(
+            @Positive @NotNull @PathVariable Long subjectId) {
+        try {
+            Subject subject = subjectService.findByIdWithMarks(subjectId);
+            return new ResponseEntity<>(subject, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/{subjectId}/full")
+    public ResponseEntity<Subject> getSubjectWithStudentsAndMarks(
+            @Positive @NotNull @PathVariable Long subjectId) {
+        try {
+            Subject subject = subjectService.findByIdWithStudentsAndMarks(subjectId);
+            return new ResponseEntity<>(subject, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{subjectId}")
     public ResponseEntity<Void> deleteSubject(@Positive @NotNull @PathVariable Long subjectId) {
-        subjectService.deleteSubject(subjectId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            subjectService.deleteSubject(subjectId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/name/{name}")
+    public ResponseEntity<Void> deleteSubjectByName(@NotEmpty @PathVariable String name) {
+        try {
+            subjectService.deleteSubjectByName(name);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

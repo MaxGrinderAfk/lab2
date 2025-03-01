@@ -2,6 +2,7 @@ package idespring.lab2.service.subjectservice;
 
 import idespring.lab2.model.Subject;
 import idespring.lab2.repository.subjectrepo.SubjectRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,37 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
+    public Subject findById(Long id) {
+        return subjectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + id));
+    }
+
+    @Override
+    public Subject findByName(String name) {
+        return subjectRepository.findByName(name)
+                .orElseThrow(() -> new
+                        EntityNotFoundException("Subject not found with name: " + name));
+    }
+
+    @Override
+    public Subject findByIdWithStudents(Long id) {
+        return subjectRepository.findByIdWithStudents(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + id));
+    }
+
+    @Override
+    public Subject findByIdWithMarks(Long id) {
+        return subjectRepository.findByIdWithMarks(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + id));
+    }
+
+    @Override
+    public Subject findByIdWithStudentsAndMarks(Long id) {
+        return subjectRepository.findByIdWithStudentsAndMarks(id)
+                .orElseThrow(() -> new EntityNotFoundException("Subject not found with id: " + id));
+    }
+
+    @Override
     public Subject addSubject(Subject subject) {
         return subjectRepository.save(subject);
     }
@@ -34,6 +66,11 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public void deleteSubject(Long id) {
         subjectRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteSubjectByName(String name) {
+        subjectRepository.deleteByName(name);
     }
 
     @Override

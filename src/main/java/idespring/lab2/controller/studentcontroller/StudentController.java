@@ -2,6 +2,7 @@ package idespring.lab2.controller.studentcontroller;
 
 import idespring.lab2.model.Student;
 import idespring.lab2.service.studservice.StudentServ;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.util.List;
@@ -20,51 +21,95 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    @PostMapping("/addStud")
+    @PostMapping
     public ResponseEntity<Student> createStudent(@Valid @RequestBody Student student) {
         return new ResponseEntity<>(studentService.addStudent(student), HttpStatus.CREATED);
     }
 
-    @GetMapping("/get/{studentId}")
-    public ResponseEntity<List<Student>>
-        getStudentById(@Positive @NotNull @PathVariable Long studentId) {
-        return !(studentService.readStudents(null, null, studentId).isEmpty())
-                ? new ResponseEntity<>(studentService
-                .readStudents(null, null, studentId), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @GetMapping("/{studentId}")
+    public ResponseEntity<Student> getStudentById(@Positive @NotNull @PathVariable Long studentId) {
+        try {
+            Student student = studentService.findById(studentId);
+            return new ResponseEntity<>(student, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("/get")
+    @GetMapping
     public ResponseEntity<List<Student>> getStudents(
-            /*@Min(12) @Max(100)*/ @RequestParam(required = false) Integer age,
-            /*@NotEmpty*/ @RequestParam(required = false) String sort) {
-        return !(studentService.readStudents(age, sort, null).isEmpty())
-                ? new ResponseEntity<>(studentService
-                .readStudents(age, sort, null), HttpStatus.OK)
+            @RequestParam(required = false) Integer age,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) Long id) {
+        List<Student> students = studentService.readStudents(age, sort, id);
+        return !students.isEmpty()
+                ? new ResponseEntity<>(students, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/update/{studentId}")
-    public ResponseEntity<List<Student>> updateStudent(@Positive @NotNull @PathVariable
-                                                           Long studentId,
-                                                       @RequestParam(required = false,
-                                                               defaultValue = "unknown")
-                                                       String name,
-                                                       @RequestParam(required = false,
-                                                               defaultValue = "15") int age) {
-        studentService.updateStudent(name, age, studentId);
-        return new ResponseEntity<>(studentService
-                .readStudents(null, null, studentId), HttpStatus.OK);
+    @GetMapping("/{studentId}/subjects")
+    public ResponseEntity<Student> getStudentWithSubjects(
+            @Positive @NotNull @PathVariable Long studentId) {
+        try {
+            Student student = studentService.findByIdWithSubjects(studentId);
+            return new ResponseEntity<>(student, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @DeleteMapping("/delete/{studentId}")
-    public ResponseEntity<List<Student>> deleteStudent(@Positive @NotNull @PathVariable
-                                                           Long studentId) {
-        studentService.deleteStudent(studentId);
-        return !(studentService.readStudents(null, null, null).isEmpty())
-                ? new ResponseEntity<>(studentService
-                .readStudents(null, null, null), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.METHOD_NOT_ALLOWED);
+    @GetMapping("/{studentId}/marks")
+    public ResponseEntity<Student> getStudentWithMarks(
+            @Positive @NotNull @PathVariable Long studentId) {
+        try {
+            Student student = studentService.findByIdWithMarks(studentId);
+            return new ResponseEntity<>(student, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
+    @GetMapping("/{studentId}/full")
+    public ResponseEntity<Student> getStudentWithSubjectsAndMarks(
+            @Positive @NotNull @PathVariable Long studentId) {
+        try {
+            Student student = studentService.findByIdWithSubjectsAndMarks(studentId);
+            return new ResponseEntity<>(student, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/group/{groupId}")
+    public ResponseEntity<List<Student>> getStudentsByGroup(
+            @Positive @NotNull @PathVariable Long groupId) {
+        List<Student> students = studentService.findByGroupId(groupId);
+        return !students.isEmpty()
+                ? new ResponseEntity<>(students, HttpStatus.OK)
+                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PutMapping("/{studentId}")
+    public ResponseEntity<Student> updateStudent(
+            @Positive @NotNull @PathVariable Long studentId,
+            @RequestParam(required = false, defaultValue = "unknown") String name,
+            @RequestParam(required = false, defaultValue = "15") int age) {
+        try {
+            studentService.updateStudent(name, age, studentId);
+            Student updatedStudent = studentService.findById(studentId);
+            return new ResponseEntity<>(updatedStudent, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{studentId}")
+    public ResponseEntity<Void> deleteStudent(@Positive @NotNull @PathVariable Long studentId) {
+        try {
+            studentService.deleteStudent(studentId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

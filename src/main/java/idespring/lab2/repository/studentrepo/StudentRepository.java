@@ -2,7 +2,8 @@ package idespring.lab2.repository.studentrepo;
 
 import idespring.lab2.model.Student;
 import jakarta.transaction.Transactional;
-import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,26 +13,49 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudentRepository extends JpaRepository<Student, Long>, StudentRepositoryCustom {
 
-    List<Student> findByAge(int age);
+    @Query(value = "SELECT * FROM studentmanagement.students WHERE age = :age", nativeQuery = true)
+    Set<Student> findByAge(@Param("age") int age);
 
-    Student findById(long id);
+    @Query(value = "SELECT * FROM studentmanagement.students WHERE id = :id", nativeQuery = true)
+    Optional<Student> findById(@Param("id") long id);
 
-    @Query("UPDATE Student s SET s.name = :name, s.age = :age WHERE s.id = :id")
     @Modifying
+    @Transactional
+    @Query(value = "UPDATE studentmanagement.students SET "
+            + "name = :name, age = :age WHERE id = :id", nativeQuery = true)
     void update(@Param("name") String name, @Param("age") int age, @Param("id") long id);
 
-    @Query("DELETE FROM Student s WHERE s.id = :id")
-    @Transactional
     @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM studentmanagement.students WHERE id = :id", nativeQuery = true)
     void delete(@Param("id") long id);
 
     @Modifying
+    @Transactional
     @Query(value = "INSERT INTO studentmanagement.student_subject "
-            + "(studentid, subjectid) VALUES (:studentId, :subjectId)", nativeQuery = true)
+            + "(studentid, subjectid) VALUES (:studentId, :subjectId)",
+            nativeQuery = true)
     void addSubject(@Param("studentId") Long studentId, @Param("subjectId") Long subjectId);
 
     @Modifying
-    @Query(value = "DELETE FROM studentmanagement.student_subject "
-            + "WHERE studentid = :studentId AND subjectid = :subjectId", nativeQuery = true)
+    @Transactional
+    @Query(value = "DELETE FROM studentmanagement.student_subject WHERE "
+            + "studentid = :studentId AND subjectid = :subjectId",
+            nativeQuery = true)
     void removeSubject(@Param("studentId") Long studentId, @Param("subjectId") Long subjectId);
+
+    @Query(value = "SELECT * FROM studentmanagement.students WHERE "
+            + "groupid = :groupId", nativeQuery = true)
+    Set<Student> findByGroupId(@Param("groupId") Long groupId);
+
+    @Query("SELECT s FROM Student s LEFT JOIN FETCH s.subjects WHERE s.id = :id")
+    Optional<Student> findByIdWithSubjects(@Param("id") Long id);
+
+    @Query("SELECT s FROM Student s LEFT JOIN FETCH s.marks WHERE s.id = :id")
+    Optional<Student> findByIdWithMarks(@Param("id") Long id);
+
+    @Query("SELECT s FROM Student s LEFT JOIN FETCH s.subjects "
+            + "LEFT JOIN FETCH s.marks WHERE s.id = :id")
+    Optional<Student> findByIdWithSubjectsAndMarks(@Param("id") Long id);
+
 }
