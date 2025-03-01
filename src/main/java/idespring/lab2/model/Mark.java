@@ -3,9 +3,6 @@ package idespring.lab2.model;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Entity
 @Table(schema = "studentmanagement", name = "marks")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -18,14 +15,12 @@ public class Mark {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "studentid")
-    @JsonIdentityReference(alwaysAsId = true)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)  // Только для десериализации
     private Student student;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "subjectid")
-    @JsonIdentityReference(alwaysAsId = true)
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)  // Только для десериализации
     private Subject subject;
 
     public Mark() {}
