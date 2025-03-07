@@ -29,8 +29,7 @@ public class Mark {
 
     public void setStudentId(Long studentId) {
         if (studentId != null) {
-            this.student = new Student();
-            this.student.setId(studentId);
+            this.student = new Student(studentId);
         }
     }
 
@@ -67,28 +66,12 @@ public class Mark {
         this.value = value;
     }
 
-    public Student getStudent() {
-        return student;
-    }
-
     public void setStudent(Student student) {
         this.student = student;
     }
 
-    public Subject getSubject() {
-        return subject;
-    }
-
     public void setSubject(Subject subject) {
         this.subject = subject;
-    }
-
-    public Long getStudentId() {
-        return student != null ? student.getId() : null;
-    }
-
-    public String getStudentName() {
-        return student != null ? student.getName() : null;
     }
 
     public Long getSubjectId() {

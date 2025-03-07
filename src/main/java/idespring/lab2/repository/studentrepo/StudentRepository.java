@@ -50,12 +50,4 @@ public interface StudentRepository extends JpaRepository<Student, Long>, Student
 
     @Query("SELECT s FROM Student s LEFT JOIN FETCH s.subjects WHERE s.id = :id")
     Optional<Student> findByIdWithSubjects(@Param("id") Long id);
-
-    @Query("SELECT s FROM Student s LEFT JOIN FETCH s.marks WHERE s.id = :id")
-    Optional<Student> findByIdWithMarks(@Param("id") Long id);
-
-    @Query("SELECT s FROM Student s LEFT JOIN FETCH s.subjects "
-            + "LEFT JOIN FETCH s.marks WHERE s.id = :id")
-    Optional<Student> findByIdWithSubjectsAndMarks(@Param("id") Long id);
-
 }

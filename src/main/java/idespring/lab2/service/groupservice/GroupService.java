@@ -10,13 +10,9 @@ public interface GroupService {
 
     Group findByName(String name);
 
-    Group findByIdWithStudents(Long id);
-
-    Group addGroup(Group group);
+    Group addGroup(String name, List<Integer> studentIds);
 
     void deleteGroup(Long id);
 
     void deleteGroupByName(String name);
-
-    boolean existsByName(String name);
 }

@@ -47,39 +47,6 @@ public class StudentController {
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/{studentId}/subjects")
-    public ResponseEntity<Student> getStudentWithSubjects(
-            @Positive @NotNull @PathVariable Long studentId) {
-        try {
-            Student student = studentService.findByIdWithSubjects(studentId);
-            return new ResponseEntity<>(student, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{studentId}/marks")
-    public ResponseEntity<Student> getStudentWithMarks(
-            @Positive @NotNull @PathVariable Long studentId) {
-        try {
-            Student student = studentService.findByIdWithMarks(studentId);
-            return new ResponseEntity<>(student, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{studentId}/full")
-    public ResponseEntity<Student> getStudentWithSubjectsAndMarks(
-            @Positive @NotNull @PathVariable Long studentId) {
-        try {
-            Student student = studentService.findByIdWithSubjectsAndMarks(studentId);
-            return new ResponseEntity<>(student, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     @GetMapping("/group/{groupId}")
     public ResponseEntity<List<Student>> getStudentsByGroup(
             @Positive @NotNull @PathVariable Long groupId) {
@@ -93,7 +60,7 @@ public class StudentController {
     public ResponseEntity<Student> updateStudent(
             @Positive @NotNull @PathVariable Long studentId,
             @RequestParam(required = false, defaultValue = "unknown") String name,
-            @RequestParam(required = false, defaultValue = "15") int age) {
+            @Positive @RequestParam(required = false, defaultValue = "15") int age) {
         try {
             studentService.updateStudent(name, age, studentId);
             Student updatedStudent = studentService.findById(studentId);

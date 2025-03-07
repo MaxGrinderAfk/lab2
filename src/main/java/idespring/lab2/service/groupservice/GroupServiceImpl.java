@@ -1,19 +1,24 @@
 package idespring.lab2.service.groupservice;
 
 import idespring.lab2.model.Group;
+import idespring.lab2.model.Student;
 import idespring.lab2.repository.grouprepo.GroupRepository;
+import idespring.lab2.repository.studentrepo.StudentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
+    private final StudentRepository studentRepository;
 
     @Autowired
-    public GroupServiceImpl(GroupRepository groupRepository) {
+    public GroupServiceImpl(GroupRepository groupRepository, StudentRepository studentRepository) {
         this.groupRepository = groupRepository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
@@ -41,13 +46,19 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group findByIdWithStudents(Long id) {
-        return groupRepository.findByIdWithStudents(id)
-                .orElseThrow(() -> new EntityNotFoundException("Group not found with id: " + id));
-    }
+    public Group addGroup(String name, List<Integer> studentIds) {
+        Group group = new Group(name);
 
-    @Override
-    public Group addGroup(Group group) {
+        if (studentIds != null && !studentIds.isEmpty()) {
+            List<Student> students = studentRepository.findAllById(
+                    studentIds.stream().map(Long::valueOf).collect(Collectors.toList())
+            );
+            for (Student student : students) {
+                student.setGroup(group);
+            }
+            group.setStudents(students);
+        }
+
         return groupRepository.save(group);
     }
 
@@ -59,10 +70,5 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void deleteGroupByName(String name) {
         groupRepository.deleteByName(name);
-    }
-
-    @Override
-    public boolean existsByName(String name) {
-        return groupRepository.existsByName(name);
     }
 }

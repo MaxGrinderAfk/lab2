@@ -60,39 +60,6 @@ public class SubjectController {
         }
     }
 
-    @GetMapping("/{subjectId}/students")
-    public ResponseEntity<Subject> getSubjectWithStudents(
-            @Positive @NotNull @PathVariable Long subjectId) {
-        try {
-            Subject subject = subjectService.findByIdWithStudents(subjectId);
-            return new ResponseEntity<>(subject, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{subjectId}/marks")
-    public ResponseEntity<Subject> getSubjectWithMarks(
-            @Positive @NotNull @PathVariable Long subjectId) {
-        try {
-            Subject subject = subjectService.findByIdWithMarks(subjectId);
-            return new ResponseEntity<>(subject, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{subjectId}/full")
-    public ResponseEntity<Subject> getSubjectWithStudentsAndMarks(
-            @Positive @NotNull @PathVariable Long subjectId) {
-        try {
-            Subject subject = subjectService.findByIdWithStudentsAndMarks(subjectId);
-            return new ResponseEntity<>(subject, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     @DeleteMapping("/{subjectId}")
     public ResponseEntity<Void> deleteSubject(@Positive @NotNull @PathVariable Long subjectId) {
         try {

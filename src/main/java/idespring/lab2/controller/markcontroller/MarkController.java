@@ -2,6 +2,7 @@ package idespring.lab2.controller.markcontroller;
 
 import idespring.lab2.model.Mark;
 import idespring.lab2.service.markservice.MarkService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.util.HashSet;
@@ -60,6 +61,23 @@ public class MarkController {
         return average != null
                 ? new ResponseEntity<>(average, HttpStatus.OK)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping("/delete-specific")
+    public ResponseEntity<String> deleteSpecificMark(
+            @RequestParam Long studentId,
+            @RequestParam String subjectName,
+            @RequestParam int markValue,
+            @RequestParam(required = false) Long id) {
+        try {
+            markService.deleteMarkSpecific(studentId, subjectName, markValue, id);
+            return ResponseEntity.ok("Specific mark deleted successfully.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while deleting the mark.");
+        }
     }
 
     @DeleteMapping("/{markId}")

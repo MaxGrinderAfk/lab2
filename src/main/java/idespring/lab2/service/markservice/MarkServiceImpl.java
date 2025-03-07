@@ -56,6 +56,16 @@ public class MarkServiceImpl implements MarkService {
     }
 
     @Override
+    public void deleteMarkSpecific(Long studentId, String subjectName, int markValue, Long id) {
+        int deletedCount = markRepository
+                .deleteMarkByStudentIdSubjectNameValueAndOptionalId(
+                        studentId, subjectName, markValue, id);
+        if (deletedCount == 0) {
+            throw new EntityNotFoundException("Mark not found with the given criteria.");
+        }
+    }
+
+    @Override
     public Double getAverageMarkBySubjectId(Long subjectId) {
         return markRepository.getAverageMarkBySubjectId(subjectId);
     }

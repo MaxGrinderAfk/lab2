@@ -42,24 +42,6 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Subject findByIdWithStudents(Long id) {
-        return subjectRepository.findByIdWithStudents(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
-    }
-
-    @Override
-    public Subject findByIdWithMarks(Long id) {
-        return subjectRepository.findByIdWithMarks(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
-    }
-
-    @Override
-    public Subject findByIdWithStudentsAndMarks(Long id) {
-        return subjectRepository.findByIdWithStudentsAndMarks(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
-    }
-
-    @Override
     public Subject addSubject(Subject subject) {
         return subjectRepository.save(subject);
     }

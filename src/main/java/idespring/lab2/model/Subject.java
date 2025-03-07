@@ -15,7 +15,10 @@ public class Subject {
     private String name;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "subjects", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "subjects", cascade = {
+            CascadeType.DETACH, CascadeType.MERGE,
+            CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.LAZY)
     private Set<Student> students = new HashSet<>();
 
     @JsonIgnore
@@ -53,23 +56,6 @@ public class Subject {
         return students;
     }
 
-    public Set<StudentInfo> getStudentsInfo() {
-        Set<StudentInfo> infos = new HashSet<>();
-        for (Student student : students) {
-            infos.add(new StudentInfo(student.getId(), student.getName(), student.getAge()));
-        }
-        return infos;
-    }
-
-    public Set<MarkInfo> getMarksInfo() {
-        Set<MarkInfo> infos = new HashSet<>();
-        for (Mark mark : marks) {
-            infos.add(new MarkInfo(mark.getId(),
-                    mark.getValue(), mark.getStudentId(), mark.getStudentName()));
-        }
-        return infos;
-    }
-
     public void setStudents(Set<Student> students) {
         this.students = students;
     }
@@ -91,8 +77,4 @@ public class Subject {
         marks.remove(mark);
         mark.setSubject(null);
     }
-
-    public record StudentInfo(Long id, String name, int age) {}
-
-    public record MarkInfo(Long id, int value, Long studentId, String studentName) {}
 }

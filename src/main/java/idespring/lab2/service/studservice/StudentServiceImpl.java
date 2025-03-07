@@ -1,10 +1,13 @@
 package idespring.lab2.service.studservice;
 
+import idespring.lab2.model.Mark;
 import idespring.lab2.model.Student;
+import idespring.lab2.model.Subject;
 import idespring.lab2.repository.studentrepo.StudentRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Collections;
-import java.util.List;
+import jakarta.transaction.Transactional;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,26 +54,25 @@ public class StudentServiceImpl implements StudentServ {
     }
 
     @Override
-    public Student findByIdWithSubjects(Long id) {
-        return studentRepository.findByIdWithSubjects(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
-    }
-
-    @Override
-    public Student findByIdWithMarks(Long id) {
-        return studentRepository.findByIdWithMarks(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
-    }
-
-    @Override
-    public Student findByIdWithSubjectsAndMarks(Long id) {
-        return studentRepository.findByIdWithSubjectsAndMarks(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOTFOUND + id));
-    }
-
-    @Override
+    @Transactional
     public Student addStudent(Student student) {
-        return studentRepository.save(student);
+        Set<Long> subjectIds = student.getSubjects().stream()
+                .map(Subject::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (Mark mark : student.getMarks()) {
+            mark.setStudent(student);
+        }
+
+        student.setSubjects(new HashSet<>());
+        Student savedStudent = studentRepository.save(student);
+
+        for (Long subjectId : subjectIds) {
+            studentRepository.addSubject(savedStudent.getId(), subjectId);
+        }
+
+        return savedStudent;
     }
 
     @Override
@@ -79,7 +81,12 @@ public class StudentServiceImpl implements StudentServ {
     }
 
     @Override
+    @Transactional
     public void deleteStudent(long id) {
+        Student student = studentRepository.findById(id).orElseThrow();
+        student.getSubjects().clear();
+        studentRepository.saveAndFlush(student);
+        studentRepository.delete(student);
         studentRepository.delete(id);
     }
 }
