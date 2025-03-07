@@ -3,8 +3,10 @@ package idespring.lab2.repository.markrepo;
 import idespring.lab2.model.Mark;
 import idespring.lab2.model.Student;
 import idespring.lab2.model.Subject;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -35,4 +37,18 @@ public interface MarkRepository extends JpaRepository<Mark, Long> {
     @Query(value = "SELECT * FROM studentmanagement.marks WHERE "
             + "subjectid = :subjectId", nativeQuery = true)
     List<Mark> findBySubjectId(@Param("subjectId") Long subjectId);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM studentmanagement.marks "
+            + "WHERE studentid = :studentId "
+            + "AND (:id IS NULL OR id = :id) "
+            + "AND value = :markValue "
+            + "AND subjectid = (SELECT id FROM studentmanagement.subjects "
+            + "WHERE name = :subjectName)",
+            nativeQuery = true)
+    int deleteMarkByStudentIdSubjectNameValueAndOptionalId(@Param("studentId") Long studentId,
+                                                           @Param("subjectName") String subjectName,
+                                                           @Param("markValue") int markValue,
+                                                           @Param("id") Long id);
 }

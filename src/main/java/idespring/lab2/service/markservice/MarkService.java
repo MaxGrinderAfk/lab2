@@ -8,6 +8,8 @@ public interface MarkService {
 
     List<Mark> findByValue(int value);
 
+    void deleteMarkSpecific(Long studentId, String subjectName, int markValue, Long id);
+
     Double getAverageMarkByStudentId(Long studentId);
 
     Double getAverageMarkBySubjectId(Long subjectId);

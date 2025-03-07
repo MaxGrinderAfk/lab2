@@ -10,12 +10,6 @@ public interface StudentServ {
 
     Student findById(Long id);
 
-    Student findByIdWithSubjects(Long id);
-
-    Student findByIdWithMarks(Long id);
-
-    Student findByIdWithSubjectsAndMarks(Long id);
-
     Student addStudent(Student student);
 
     void updateStudent(String name, int age, long id);

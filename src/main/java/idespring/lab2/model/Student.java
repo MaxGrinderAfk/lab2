@@ -26,9 +26,10 @@ public class Student {
     private Group group;
 
     @JsonIdentityReference(alwaysAsId = true)
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE,
-            CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.DETACH,
+            CascadeType.REFRESH, CascadeType.MERGE,
+            CascadeType.PERSIST},
+             fetch = FetchType.LAZY)
     @JoinTable (
             name = "student_subject",
             joinColumns = @JoinColumn(name = "studentid"),
@@ -95,5 +96,10 @@ public class Student {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    public void addMark(Mark mark) {
+        mark.setStudent(this);
+        this.marks.add(mark);
     }
 }

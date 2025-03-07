@@ -5,6 +5,7 @@ import idespring.lab2.service.groupservice.GroupService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.*;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +22,12 @@ public class GroupController {
     }
 
     @PostMapping
-    public ResponseEntity<Group> createGroup(@RequestBody Group group) {
-        if (groupService.existsByName(group.getName())) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
-        return new ResponseEntity<>(groupService.addGroup(group), HttpStatus.CREATED);
+    public ResponseEntity<Group> createGroup(@RequestBody Map<String, Object> request) {
+        String name = (String) request.get("name");
+        List<Integer> studentIds = (List<Integer>) request.get("studentIds");
+
+        Group group = groupService.addGroup(name, studentIds);
+        return ResponseEntity.status(HttpStatus.CREATED).body(group);
     }
 
     @GetMapping
@@ -52,17 +54,6 @@ public class GroupController {
     public ResponseEntity<Group> getGroupByName(@NotEmpty @PathVariable String name) {
         try {
             Group group = groupService.findByName(name);
-            return new ResponseEntity<>(group, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @GetMapping("/{groupId}/students")
-    public ResponseEntity<Group> getGroupWithStudents(@Positive
-                                                          @NotNull @PathVariable Long groupId) {
-        try {
-            Group group = groupService.findByIdWithStudents(groupId);
             return new ResponseEntity<>(group, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

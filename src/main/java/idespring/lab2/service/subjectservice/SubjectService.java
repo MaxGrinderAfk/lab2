@@ -10,12 +10,6 @@ public interface SubjectService {
 
     Subject findByName(String name);
 
-    Subject findByIdWithStudents(Long id);
-
-    Subject findByIdWithMarks(Long id);
-
-    Subject findByIdWithStudentsAndMarks(Long id);
-
     Subject addSubject(Subject subject);
 
     void deleteSubject(Long id);
