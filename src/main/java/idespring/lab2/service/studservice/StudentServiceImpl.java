@@ -87,6 +87,5 @@ public class StudentServiceImpl implements StudentServ {
         student.getSubjects().clear();
         studentRepository.saveAndFlush(student);
         studentRepository.delete(student);
-        studentRepository.delete(id);
     }
 }
