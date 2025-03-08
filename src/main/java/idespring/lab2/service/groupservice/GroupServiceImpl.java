@@ -6,7 +6,6 @@ import idespring.lab2.repository.grouprepo.GroupRepository;
 import idespring.lab2.repository.studentrepo.StudentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +50,7 @@ public class GroupServiceImpl implements GroupService {
 
         if (studentIds != null && !studentIds.isEmpty()) {
             List<Student> students = studentRepository.findAllById(
-                    studentIds.stream().map(Long::valueOf).collect(Collectors.toList())
+                    studentIds.stream().map(Long::valueOf).toList()
             );
             for (Student student : students) {
                 student.setGroup(group);
